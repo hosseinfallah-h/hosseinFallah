@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>حسین فلاح | برنامه‌نویس و کارشناس هوش مصنوعی</title>
+    <!-- Tailwind + Font Awesome + Vazir -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: #eef5fa;
+            color: #1e3a5f;
+            overflow-x: hidden;
+        }
+
+        /* Particle canvas - سبک و زیبا */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background: linear-gradient(145deg, #e2f0ff 0%, #ffffff 100%);
+        }
+
+        /* کارت‌های شیشه‌ای */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 2.5rem;
+            box-shadow: 0 15px 35px -15px rgba(0, 90, 130, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #1f8cb0;
+            box-shadow: 0 20px 40px -15px rgba(31, 140, 176, 0.3);
+        }
+
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            border-radius: 4rem;
+            box-shadow: 0 4px 20px rgba(0, 90, 130, 0.1);
+            padding: 0.5rem 2rem;
+        }
+
+        .navbar-logo-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(31, 140, 176, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .navbar-logo-img {
+                display: none;
+            }
+        }
+
+        /* هیرو با تصویر بزرگ */
+        .hero-3d {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 25px 50px -15px #1f8cb0, 0 0 40px rgba(31, 140, 176, 0.3);
+            transition: transform 0.1s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (max-width: 640px) {
+            .hero-3d {
+                width: 260px;
+                height: 260px;
+            }
+        }
+
+        .hero-bg-name {
+            position: absolute;
+            font-size: 18vw;
+            font-weight: 900;
+            color: rgba(31, 140, 176, 0.08);
+            white-space: nowrap;
+            user-select: none;
+            letter-spacing: -4px;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 0.6rem 2rem;
+            border-radius: 60px;
+            border: 1px solid rgba(31, 140, 176, 0.3);
+            color: #1e3a5f;
+            font-size: 0.95rem;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+            z-index: 30;
+        }
+
+        .section-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3a5f, #1f8cb0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* تگ مهارت */
+        .skill-tag {
+            background: white;
+            border: 1px solid #cde1f0;
+            color: #1e4b6e;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            display: inline-block;
+            transition: 0.2s;
+        }
+
+        .skill-tag:hover {
+            background: #e3f0fa;
+            border-color: #1f8cb0;
+            transform: translateY(-2px);
+        }
+
+        /* گرید ویدیو */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .video-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .video-card {
+            aspect-ratio: 9/16;
+            border-radius: 1.8rem;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 10px 25px -10px rgba(31, 140, 176, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            transition: 0.2s;
+        }
+
+        .video-card:hover {
+            transform: scale(1.02);
+            border-color: #1f8cb0;
+            box-shadow: 0 20px 30px -12px #1f8cb0;
+        }
+
+        .video-card video,
+        .video-card iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            background: #d4e7f7;
+        }
+
+        /* استایل انیمیشن‌ها */
+        .anim-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .anim-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .anim-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .anim-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 1.5rem;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: 0.2s;
+        }
+
+        .anim-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #1f8cb0;
+        }
+
+        .anim-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 0.5rem;
+            border: 2px solid white;
+            box-shadow: 0 0 15px rgba(31, 140, 176, 0.3);
+        }
+
+        .anim-item span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1d3d5c;
+            display: block;
+        }
+
+        /* تایم‌لاین */
+        .timeline-item {
+            position: relative;
+            padding-right: 2rem;
+            padding-bottom: 1.8rem;
+            border-right: 2px solid #7fc1d9;
+            margin-right: 1rem;
+        }
+
+        .timeline-item:last-child {
+            border-right-color: transparent;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            right: -0.6rem;
+            top: 0.3rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: #1f8cb0;
+            border: 3px solid white;
+            box-shadow: 0 0 15px #1f8cb0;
+        }
+
+        /* لینک آیتم */
+        .link-item {
+            background: white;
+            border: 1px solid #cde1f0;
+            border-radius: 60px;
+            padding: 0.7rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #1d3d5c;
+            transition: 0.2s;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .link-item:hover {
+            background: #e3f0fa;
+            border-color: #1f8cb0;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(31, 140, 176, 0.2);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.2, 0.9, 0.1, 1.1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #d2e6f5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1f8cb0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- ناوبری با لوگو (logo.jpg) -->
+    <nav
+        class="nav-glass fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center justify-between gap-4 md:gap-12 px-5 md:px-9 py-1.5 w-auto min-w-[320px] md:min-w-[650px]">
+        <div class="flex items-center gap-2">
+            <img src="./logo.jpg" alt="لوگوی حسین فلاح" class="navbar-logo-img"
+                onerror="this.src='https://placehold.co/100x100/1f8cb0/white?text=HF'">
+            <span class="text-[#1d3d5c] font-bold text-base md:text-lg">حسین فلاح</span>
+        </div>
+        <div class="flex gap-2 md:gap-6 text-xs md:text-sm font-medium text-[#1d3d5c]">
+            <a href="#hero" class="hover:text-sky-700 px-1">خانه</a>
+            <a href="#experience" class="hover:text-sky-700 px-1">سوابق</a>
+            <a href="#projects_section" class="hover:text-sky-700 px-1">پروژه‌ها</a>
+            <a href="#skills" class="hover:text-sky-700 px-1">مهارت‌ها</a>
+            <a href="#contact" class="hover:text-sky-700 px-1">تماس</a>
+        </div>
+    </nav>
+
+    <!-- هیرو با تصویر بزرگ -->
+    <section id="hero" class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div class="hero-bg-name">حسین فلاح</div>
+        <img src="./me.jpg" alt="حسین فلاح" class="hero-3d z-10" id="heroImg"
+            onerror="this.src='https://placehold.co/400x400/1f8cb0/white?text=Hossein+Fallah'">
+        <div class="scroll-hint">
+            <i class="fas fa-arrow-down animate-bounce ml-2"></i>
+            <span>به پایین اسکرول کنید</span>
+            <i class="fas fa-arrow-down animate-bounce mr-2"></i>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-3 md:px-6 max-w-7xl relative z-20 pb-28">
+
+        <!-- معرفی -->
+        <div class="glass-panel p-8 md:p-10 my-12 text-center reveal">
+            <h1 class="text-4xl md:text-5xl font-black mb-2 text-[#1d3d5c]">حسین فلاح</h1>
+            <p class="text-xl md:text-2xl text-[#1f8cb0] font-light">توسعه‌دهنده Full-Stack و متخصص هوش مصنوعی</p>
+            <p class="max-w-2xl mx-auto mt-5 text-[#2b4b6e] leading-relaxed text-sm md:text-base">
+                توسعه‌دهنده نرم‌افزار با تمرکز بر ساخت محصولات هوشمند و مقیاس‌پذیر. علاقه‌مند به حل چالش‌های پیچیده
+                با ترکیب مهندسی نرم‌افزار مدرن و الگوریتم‌های یادگیری ماشین.
+            </p>
+        </div>
+
+        <!-- ویدیوهای یوتیوب -->
+        <section class="mb-12 reveal">
+            <h2 class="section-title"><i class="fas fa-film text-sky-600"></i> ویدیوهای یوتیوب</h2>
+            <div class="glass-panel p-5 md:p-7">
+                <div class="video-grid">
+                    <div class="video-card"><iframe class="w-full h-full"
+                            src="https://www.youtube.com/embed/jXM1hzOZ5KA" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="video-card"><iframe class="w-full h-full"
+                            src="https://www.youtube.com/embed/fbTyXkBRS9M" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="video-card"><iframe class="w-full h-full"
+                            src="https://www.youtube.com/embed/KNnQkMypayA" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="video-card"><iframe class="w-full h-full"
+                            src="https://www.youtube.com/embed/1CW9wkW6mgE" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="video-card"><iframe class="w-full h-full"
+                            src="https://www.youtube.com/embed/fLcnTd2dZyQ" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                    <div class="video-card"><iframe class="w-full h-full"
+                            src="https://www.youtube.com/embed/neaPPT9y6fc" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+                <div class="mt-6 bg-white/70 rounded-full px-5 py-3 text-center">
+                    <span class="text-[#1d3d5c]"><i class="fab fa-instagram text-pink-500 ml-1"></i> aizoted.ir - همکاری
+                        در تدوین و بازیگر چند ویدیو</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ویدیوهای محلی -->
+        <section id="videos" class="mb-12 reveal">
+            <h2 class="section-title"><i class="fas fa-video text-sky-600"></i> ویدیوهای تولیدشده</h2>
+            <div class="glass-panel p-5 md:p-7">
+                <div class="video-grid" id="localVideoGrid"></div>
+                <div class="mt-6 text-center">
+                    <span
+                        class="inline-block bg-[#1f8cb0] text-white px-6 py-2.5 rounded-full text-sm font-medium shadow-lg">
+                        <i class="fas fa-check-circle ml-1"></i> ۱۹ ویدیوی نمونه
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- انواع انیمیشن -->
+        <section class="mb-12 reveal">
+            <h2 class="section-title"><i class="fas fa-palette text-sky-600"></i> سبک‌های انیمیشن</h2>
+            <div class="glass-panel p-6 md:p-8">
+                <div class="anim-grid" id="animGrid"></div>
+                <p class="text-center mt-6 text-sm text-[#1f4a70] bg-white/50 rounded-full py-2 px-4">
+                    * آشنایی با این سبک‌ها و استفاده در تولید محتوا
+                </p>
+            </div>
+        </section>
+
+        <!-- گرید اصلی محتوا -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- ستون راست (عریض‌تر) -->
+            <div class="lg:col-span-2 space-y-8">
+
+                <!-- سوابق شغلی (کامل از سایت قبلی) -->
+                <section id="experience" class="glass-panel p-7 reveal">
+                    <h2 class="section-title"><i class="fas fa-briefcase"></i> سوابق شغلی</h2>
+                    <div class="relative">
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مدرس هوش مصنوعی در کسب و کار</h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">دانشگاه آزاد اسلامی واحد تهران جنوب</p>
+                            <p class="mt-2 text-sm leading-relaxed text-[#2b4b6e]">تدریس دوره‌های کاربردی هوش مصنوعی و
+                                تحلیل داده در محیط کسب و کار، با تمرکز بر انتقال مهارت‌های عملی.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مشاور و مدرس ارشد نرم‌افزار</h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">آکادمی Aitozed</p>
+                            <p class="mt-2 text-sm leading-relaxed text-[#2b4b6e]">طراحی و تدریس دوره‌های پیشرفته مهندسی
+                                نرم‌افزار و هوش مصنوعی. راهبری و منتورشیپ توسعه‌دهندگان.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مدیر پروژه - جذب و استخدام هوشمند (iSelect)
+                            </h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">ایساکو</p>
+                            <p class="mt-2 text-sm text-[#2b4b6e]">رهبری پروژه توسعه پلتفرم هوشمند iSelect برای
+                                بهینه‌سازی فرآیندهای جذب و استخدام با AI.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مهندس نرم‌افزار - مدیریت منابع انسانی (ماهم)
+                            </h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">پروژه MAAHAM</p>
+                            <p class="mt-2 text-sm text-[#2b4b6e]">توسعه ماژول‌های اصلی پروژه مدیریت منابع انسانی مبتنی
+                                بر هوش مصنوعی.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مهندس هوش مصنوعی</h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">نوآوران فناوری آینده زیبا (ایران خودرو)</p>
+                            <p class="mt-2 text-sm text-[#2b4b6e]">توسعه مدل‌های یادگیری عمیق برای پروژه عیب‌یابی صوتی
+                                خودرو.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مهندس نرم افزار فرانت‌اند</h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">نوآوران فناوری آینده زیبا</p>
+                            <p class="mt-2 text-sm text-[#2b4b6e]">توسعه رابط کاربری پروژه "گنج درون" با React.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مدیر فنی و مدرس</h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">رویاسازان جوان مهر</p>
+                            <p class="mt-2 text-sm text-[#2b4b6e]">مدیریت فنی و تدریس برنامه‌نویسی، هوش مصنوعی و
+                                حسابداری.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h3 class="text-lg font-bold text-[#1d3d5c]">مسئول اجرایی کانون‌های ارزیابی</h3>
+                            <p class="text-sm font-medium text-[#1f8cb0]">HCtech</p>
+                            <p class="mt-2 text-sm text-[#2b4b6e]">برگزاری کانون‌های ارزیابی برای بانک‌های ملت، مهر
+                                ایران و دی.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- پروژه‌ها و لینک‌ها -->
+                <section id="projects_section" class="glass-panel p-7 reveal">
+                    <h2 class="section-title"><i class="fas fa-link"></i> پروژه‌ها و لینک‌های مرتبط</h2>
+                    <div class="space-y-4">
+                        <h4 class="font-bold border-r-4 pr-2 border-sky-500 text-[#1d3d5c]">وبسایت‌های فعال</h4>
+                        <div class="space-y-2">
+                            <a href="https://fallahh.vercel.app/" target="_blank" class="link-item">
+                                <i class="fas fa-globe-americas w-6 text-center text-green-400"></i>
+                                <span class="font-medium mr-3">fallahh.vercel.app (پورتفولیو)</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hosseinfallah-h.github.io/reyhantex_showroom/" target="_blank"
+                                class="link-item">
+                                <i class="fas fa-images w-6 text-center text-purple-400"></i>
+                                <span class="font-medium mr-3">نمایشگاه ریحان‌تکس (۷۰۰+ عکس)</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://reyhantex.com/" target="_blank" class="link-item">
+                                <i class="fas fa-store w-6 text-center text-blue-400"></i>
+                                <span class="font-medium mr-3">reyhantex.com</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hosseinfallah-h.github.io/reyhantex_card/" target="_blank"
+                                class="link-item">
+                                <i class="fas fa-id-card w-6 text-center text-yellow-400"></i>
+                                <span class="font-medium mr-3">کارت ویزیت ریحان‌تکس</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hosseinfallah-h.github.io/html_css_course/" target="_blank"
+                                class="link-item">
+                                <i class="fab fa-html5 w-6 text-center text-orange-400"></i>
+                                <span class="font-medium mr-3">دوره HTML/CSS</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hosseinfallah-h.github.io/TehranJonubAiPresentation2/" target="_blank"
+                                class="link-item">
+                                <i class="fas fa-university w-6 text-center text-indigo-400"></i>
+                                <span class="font-medium mr-3">ارائه دانشگاه تهران جنوب</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hoonaco.ir/" target="_blank" class="link-item">
+                                <i class="fas fa-briefcase w-6 text-center text-gray-400"></i>
+                                <span class="font-medium mr-3">hoonaco.ir</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://navardfuladfars.com/" target="_blank" class="link-item">
+                                <i class="fas fa-industry w-6 text-center text-red-400"></i>
+                                <span class="font-medium mr-3">navardfuladfars.com</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hosseinfallah-h.github.io/hackStyleResume/" target="_blank"
+                                class="link-item">
+                                <i class="fas fa-laptop-code w-6 text-center text-emerald-400"></i>
+                                <span class="font-medium mr-3">hackStyleResume</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hosseinfallah-h.github.io/promptTest/" target="_blank" class="link-item">
+                                <i class="fas fa-magic w-6 text-center text-pink-400"></i>
+                                <span class="font-medium mr-3">promptTest</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://hosseinfallah-h.github.io/iSelect_presentation/" target="_blank"
+                                class="link-item">
+                                <i class="fas fa-chart-line w-6 text-center text-amber-400"></i>
+                                <span class="font-medium mr-3">iSelect presentation</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                        </div>
+
+                        <h4 class="font-bold pt-4 border-r-4 pr-2 border-sky-500 text-[#1d3d5c]">مخازن گیت‌هاب</h4>
+                        <div class="space-y-2">
+                            <a href="https://github.com/hosseinfallah-h/pana_news_automation" target="_blank"
+                                class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">سیستم اتوماسیون اخبار پانا</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://github.com/hosseinfallah-h/AI_RMS" target="_blank" class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">سیستم مدیریت رزومه با هوش مصنوعی</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://github.com/hosseinfallah-h/CustomerCommentAnalysis" target="_blank"
+                                class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">تحلیل نظرات مشتریان</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://github.com/hosseinfallah-h/TehranJonubAiPresentation" target="_blank"
+                                class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">مخزن اسلایدهای دانشگاه</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://github.com/hosseinfallah-h/iSelectMVP_gemma3_1b" target="_blank"
+                                class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">iSelect MVP با Gemma3</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://github.com/hosseinfallah-h/iSelectMVP_Qwen2.5-1.5b" target="_blank"
+                                class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">iSelect MVP با Qwen2.5</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://github.com/hosseinfallah-h/idea-sandbox-app" target="_blank"
+                                class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">idea-sandbox-app</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                            <a href="https://github.com/hosseinfallah-h/jdEsfahan" target="_blank" class="link-item">
+                                <i class="fab fa-github w-6 text-center"></i>
+                                <span class="font-medium mr-3">jdEsfahan (دوره جهاد دانشگاهی)</span>
+                                <i class="fas fa-external-link-alt text-xs mr-auto"></i>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ستون چپ (باریک‌تر) -->
+            <div class="lg:col-span-1 space-y-8">
+
+                <!-- مهارت‌ها -->
+                <section id="skills" class="glass-panel p-7 reveal">
+                    <h2 class="section-title"><i class="fas fa-cogs"></i> حوزه‌های تخصصی</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold mb-2 text-[#1d3d5c]">توسعه نرم‌افزار</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag">Next.js</span><span class="skill-tag">React</span>
+                                <span class="skill-tag">Node.js</span><span class="skill-tag">Express</span>
+                                <span class="skill-tag">Prisma</span><span class="skill-tag">MongoDB</span>
+                                <span class="skill-tag">SQL</span><span class="skill-tag">Python</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2 text-[#1d3d5c]">هوش مصنوعی</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag">Machine Learning</span>
+                                <span class="skill-tag">LLM Fine-tuning</span>
+                                <span class="skill-tag">PyTorch</span>
+                                <span class="skill-tag">Cybersecurity</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2 text-[#1d3d5c]">تولید محتوا</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag">Midjourney</span>
+                                <span class="skill-tag">Runway</span>
+                                <span class="skill-tag">Premiere</span>
+                                <span class="skill-tag">After Effects</span>
+                                <span class="skill-tag">Blender</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2 text-[#1d3d5c]">زبان‌های خارجی</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="skill-tag">انگلیسی</span>
+                                <span class="skill-tag">فرانسوی (مبتدی)</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- گواهینامه‌ها -->
+                <section class="glass-panel p-7 reveal">
+                    <h2 class="section-title"><i class="fas fa-graduation-cap"></i> گواهینامه‌ها</h2>
+                    <div class="space-y-3">
+                        <div class="border-r-2 pr-3 py-1" style="border-color: #1f8cb0;">
+                            <h3 class="font-bold text-[#1d3d5c]">CS50's AI with Python</h3>
+                            <p class="text-xs text-[#2b4b6e]">Harvard University</p>
+                        </div>
+                        <div class="border-r-2 pr-3 py-1" style="border-color: #1f8cb0;">
+                            <h3 class="font-bold text-[#1d3d5c]">CS50x Introduction to CS</h3>
+                            <p class="text-xs text-[#2b4b6e]">Harvard University</p>
+                        </div>
+                        <div class="border-r-2 pr-3 py-1" style="border-color: #1f8cb0;">
+                            <h3 class="font-bold text-[#1d3d5c]">CS50P Python</h3>
+                            <p class="text-xs text-[#2b4b6e]">Harvard University</p>
+                        </div>
+                        <div class="border-r-2 pr-3 py-1" style="border-color: #1f8cb0;">
+                            <h3 class="font-bold text-[#1d3d5c]">CS50 Cybersecurity</h3>
+                            <p class="text-xs text-[#2b4b6e]">Harvard University</p>
+                        </div>
+                        <div class="border-r-2 pr-3 py-1" style="border-color: #1f8cb0;">
+                            <h3 class="font-bold text-[#1d3d5c]">AI Expert</h3>
+                            <p class="text-xs text-[#2b4b6e]">Sharif University</p>
+                        </div>
+                        <div class="border-r-2 pr-3 py-1" style="border-color: #1f8cb0;">
+                            <h3 class="font-bold text-[#1d3d5c]">دوره هوش مصنوعی</h3>
+                            <p class="text-xs text-[#2b4b6e]">Filager AI School</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- تماس -->
+                <section id="contact" class="glass-panel p-7 reveal">
+                    <h2 class="section-title"><i class="fas fa-user-circle"></i> تماس</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-phone-alt w-5 text-center text-[#1f8cb0]"></i>
+                            <span class="font-medium text-[#1d3d5c]">+98 901 454 6422</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-envelope w-5 text-center text-[#1f8cb0]"></i>
+                            <a href="mailto:hosseinfallah294@gmail.com"
+                                class="text-[#1d3d5c]">hosseinfallah294@gmail.com</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-telegram w-5 text-center text-[#1f8cb0]"></i>
+                            <a href="https://t.me/hosseinfallah_h" class="text-[#1d3d5c]">@hosseinfallah_h</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-github w-5 text-center"></i>
+                            <a href="https://github.com/hosseinfallah-h" class="text-[#1d3d5c]">hosseinfallah-h</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-instagram w-5 text-center text-pink-400"></i>
+                            <a href="https://instagram.com/hosseinfallah_h" class="text-[#1d3d5c]">@hosseinfallah_h</a>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-white/30 flex flex-col items-center">
+                        <img src="./logo.jpg" class="w-16 h-16 rounded-full border-3 border-white shadow"
+                            onerror="this.src='https://placehold.co/100x100/1f8cb0/white?text=HF'">
+                        <span class="font-bold mt-2 text-[#1d3d5c]">حسین فلاح</span>
+                        <span class="text-xs text-[#2b4b6e]">توسعه‌دهنده و متخصص هوش مصنوعی</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <footer class="text-center text-[#2b4b6e] text-xs border-t border-white/30 pt-6 mt-8">
+            طراحی توسط حسین فلاح - ۱۴۰۴
+        </footer>
+    </main>
+
+    <script>
+        (function () {
+            // لیست ویدیوهای محلی
+            const videoFiles = [
+                "20251209_2119_01kc1kepneebcb3nnrneqsrybg.mp4",
+                "20251209_2125_01kc1kepneebcb3nnrneqsrybg.mp4",
+                "20251209_2223_01kc278b9nf72b87r34zc8dc0m.mp4",
+                "20251212_1145_01kc8rfnkpe6fa66c77jjfjsb3.mp4",
+                "grok-video-70357de6-f6c7-4a76-9449-dfd5faadbaf6.mp4",
+                "lv_0_20260102130029.mp4",
+                "lv_0_20260102192602.mp4",
+                "lv_0_20260105163154.mp4",
+                "lv_0_20260105172047.mp4",
+                "lv_0_20260201120037.mp4",
+                "VID_20251220_142416_948.mp4",
+                "YouCut_20251224_164243414.mp4",
+                "YouCut_20260224_113402923.mp4",
+                "YouCut_20260224_113540595.mp4",
+                "YouCut_20260224_122246791.mp4",
+                "YouCut_20260224_124205459.mp4",
+                "YouCut_20260224_133728791 (1).mp4",
+                "YouCut_20260224_133728791.mp4",
+                "YouCut_20260224_134113873.mp4"
+            ];
+
+            // شافل کردن
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            // اضافه کردن ویدیوها
+            const container = document.getElementById('localVideoGrid');
+            if (container) {
+                const shuffled = shuffleArray([...videoFiles]);
+                shuffled.forEach((file, index) => {
+                    const posterSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='500' viewBox='0 0 300 500'%3E%3Crect width='300' height='500' fill='%23${(100 + index * 5).toString(16)}8cb0'/%3E%3Ctext x='30' y='250' font-family='Vazirmatn' font-size='20' fill='white'%3Eویدیو ${index + 1}%3C/text%3E%3C/svg%3E`;
+
+                    const div = document.createElement('div');
+                    div.className = 'video-card';
+                    div.innerHTML = `
+                    <video controls preload="none" poster="${posterSvg}">
+                        <source src="./assets/videos/${file}" type="video/mp4">
+                    </video>
+                `;
+                    container.appendChild(div);
+                });
+            }
+
+            // انواع انیمیشن
+            const animTypes = [
+                { name: "2D", file: "2d animation.png" },
+                { name: "سه‌بعدی", file: "3d animation.png" },
+                { name: "AR", file: "augmented-reality.png" },
+                { name: "چاکیمیشن", file: "chuckimation.png" },
+                { name: "انیمه کلاسیک", file: "classic-anime.png" },
+                { name: "خمیری", file: "clay.png" },
+                { name: "دیزنی", file: "disney-classic.png" },
+                { name: "فلپ‌بوک", file: "flipbook.png" },
+                { name: "جیبلی", file: "ghibli.png" },
+                { name: "مینیمال", file: "minimalist.png" },
+                { name: "مدل", file: "model-animation.png" },
+                { name: "انیمه مدرن", file: "modern-anime.png" },
+                { name: "دیزنی مدرن", file: "modern-disney.png" },
+                { name: "پیکسار", file: "modern-pixar.png" },
+                { name: "نقاشی روی شیشه", file: "paint-on-glass.png" },
+                { name: "کاغذ برش‌خورده", file: "paper-cutout.png" },
+                { name: "عروسکی", file: "puppetry.png" },
+                { name: "کارتون رئال", file: "realistic-cartoon.png" },
+                { name: "تیم برتون", file: "tim-burton.png" },
+                { name: "بازی ویدیویی", file: "video-game.png" }
+            ];
+
+            const animGrid = document.getElementById('animGrid');
+            if (animGrid) {
+                animTypes.forEach(anim => {
+                    const div = document.createElement('div');
+                    div.className = 'anim-item';
+                    div.innerHTML = `
+                    <img src="./assets/images/${anim.file}" alt="${anim.name}" onerror="this.src='https://placehold.co/100x100/1f8cb0/white?text=${anim.name}'">
+                    <span>${anim.name}</span>
+                `;
+                    animGrid.appendChild(div);
+                });
+            }
+
+            // پارتیکل
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                let particles = [];
+
+                function initParticles() {
+                    particles = [];
+                    for (let i = 0; i < 50; i++) {
+                        particles.push({
+                            x: Math.random(),
+                            y: Math.random(),
+                            vx: (Math.random() - 0.5) * 0.002,
+                            vy: (Math.random() - 0.5) * 0.002,
+                            size: Math.random() * 3 + 1,
+                            alpha: Math.random() * 0.3 + 0.1
+                        });
+                    }
+                }
+
+                function resizeCanvas() {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                }
+
+                function drawParticles() {
+                    ctx.clearRect(0, 0, width, height);
+                    for (let p of particles) {
+                        ctx.globalAlpha = p.alpha;
+                        ctx.beginPath();
+                        ctx.arc(p.x * width, p.y * height, p.size, 0, Math.PI * 2);
+                        ctx.fillStyle = '#1f8cb0';
+                        ctx.shadowColor = '#1f8cb0';
+                        ctx.shadowBlur = 10;
+                        ctx.fill();
+                    }
+                }
+
+                function updateParticles() {
+                    for (let p of particles) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if (p.x < 0) p.x = 1;
+                        if (p.x > 1) p.x = 0;
+                        if (p.y < 0) p.y = 1;
+                        if (p.y > 1) p.y = 0;
+                    }
+                    drawParticles();
+                    requestAnimationFrame(updateParticles);
+                }
+
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+                initParticles();
+                updateParticles();
+            }
+
+            // افکت هیرو
+            const heroImg = document.getElementById('heroImg');
+            window.addEventListener('scroll', () => {
+                let v = window.scrollY;
+                if (heroImg) heroImg.style.transform = `translateY(${v * 0.2}px)`;
+            });
+
+            // ریویل
+            const reveals = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => e.isIntersecting ? e.target.classList.add('active') : e.target.classList.remove('active'));
+            }, { threshold: 0.1 });
+            reveals.forEach(r => observer.observe(r));
+        })();
+    </script>
+</body>
+
+</html>
